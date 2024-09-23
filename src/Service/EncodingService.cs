@@ -16,13 +16,15 @@ namespace ANSIConverter.Service
             string finalPath = $"{fileNameWithoutExtension}_ANSI.csv";
             var streamWritter = new StreamWriter(finalPath, false, Encoding.Latin1);
 
-            using (StreamReader reader = new StreamReader(new FileStream(path, FileMode.Open), Encoding.Latin1))
+            using (StreamReader reader = new StreamReader(new FileStream(path, FileMode.Open), Encoding.UTF8))
             {
                 Stream baseStream = reader.BaseStream; long length = baseStream.Length;
 
                 var header = true;
                 while ((line = reader.ReadLine()) != null)
                 {
+                    line = line.Replace("\"", "").Replace("'", "");
+
                     if (header)
                     {
                         streamWritter.WriteLine(line);
@@ -36,6 +38,9 @@ namespace ANSIConverter.Service
 
                     Application.DoEvents();
                 }
+
+                streamWritter.Flush();
+                streamWritter.Close();
 
                 return finalPath;
             }
